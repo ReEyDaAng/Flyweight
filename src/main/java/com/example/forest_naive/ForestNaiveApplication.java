@@ -1,34 +1,43 @@
 package com.example.forest_naive;
 
+import com.example.forest_naive.model.Tree;
 import com.example.forest_naive.service.ForestService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.util.Map;
+
 @SpringBootApplication(
 		exclude = DataSourceAutoConfiguration.class
 )
 public class ForestNaiveApplication {
 	public static void main(String[] args) {
-		// 1. Запускаємо Spring-контекст
 		ConfigurableApplicationContext ctx = SpringApplication.run(ForestNaiveApplication.class, args);
 		ForestService service = ctx.getBean(ForestService.class);
 
-		// 2. Заміряємо пам'ять до ініціалізації
+		// Демонстрація: створимо по 500 PINE та PALM і по 200 OAK
+		Map<Tree.TreeType, Integer> demo = Map.of(
+				Tree.TreeType.PINE, 500,
+				Tree.TreeType.PALM, 500,
+				Tree.TreeType.OAK, 200
+		);
+
 		Runtime rt = Runtime.getRuntime();
 		rt.gc();
 		long before = rt.totalMemory() - rt.freeMemory();
 
-		// 3. Ініціалізуємо список дерев
-		service.init();
+		int total = service.createTreesBatch(demo);  // використовується метод batch
 
-		// 4. Заміряємо пам'ять після створення
 		rt.gc();
 		long after = rt.totalMemory() - rt.freeMemory();
 
-		long usedBytes = after - before;
-		System.out.printf("Trees: %d, memory used = %,d bytes (≈ %.2f KB)%n",
-				service.getAllNaive().size(), usedBytes, usedBytes / 1024.0);
+		System.out.printf(
+				"Demo added %,d trees, memory used = %,d bytes (≈ %.2f KB)%n",
+				total,
+				(after - before),
+				(after - before) / 1024.0
+		);
 	}
 }

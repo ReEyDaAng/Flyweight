@@ -1,26 +1,50 @@
 package com.example.forest_naive.controller;
 
-import com.example.forest_naive.model.TreeNaive;
+import com.example.forest_naive.model.Tree;
 import com.example.forest_naive.service.ForestService;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
-// Дозволяємо запити з React‑девсерверу
+@RequestMapping("/api/forest")
 @CrossOrigin(origins = "http://localhost:3000")
 public class ForestController {
+    private final ForestService service;
 
-    private final ForestService forestService;
-
-    public ForestController(ForestService forestService) {
-        this.forestService = forestService;
+    public ForestController(ForestService service) {
+        this.service = service;
     }
 
-    @GetMapping("/api/forest/naive")
-    public List<TreeNaive> getNaiveForest() {
-        return forestService.getAllNaive();
+    /**
+     * POST /api/forest/createTreesBatch
+     * Тіло запиту: JSON-об'єкт, де ключі — типи (PINE, PALM, OAK), значення — кількість.
+     */
+    @PostMapping("/createTreesBatch")
+    public ResponseEntity<String> createTreesBatch(
+            @RequestBody Map<Tree.TreeType, Integer> request) {
+        int totalAdded = service.createTreesBatch(request);
+        return ResponseEntity.ok("Added total " + totalAdded + " trees");
+    }
+
+    /**
+     * DELETE /api/forest/removeTrees?count={count}
+     * Видаляє останні count дерев.
+     */
+    @DeleteMapping("/removeTrees")
+    public ResponseEntity<String> removeTrees(@RequestParam int count) {
+        int removed = service.removeTrees(count);
+        return ResponseEntity.ok("Removed " + removed + " trees");
+    }
+
+    /**
+     * GET /api/forest/getTrees
+     * Повертає список усіх дерев.
+     */
+    @GetMapping("/getTrees")
+    public List<Tree> getTrees() {
+        return service.getTrees();
     }
 }

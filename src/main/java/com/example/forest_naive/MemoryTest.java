@@ -1,29 +1,29 @@
 package com.example.forest_naive;
 
-import com.example.forest_naive.model.TreeNaive;
+import com.example.forest_naive.model.Tree;
 import com.example.forest_naive.service.ForestService;
 
 import java.util.List;
 
 public class MemoryTest {
     public static void main(String[] args) {
-        ForestService forest = new ForestService();
+        ForestService service = new ForestService();
+        int count = 1000;
+        Tree.TreeType type = Tree.TreeType.PINE;
 
-        // Вимірюємо пам'ять до ініціалізації
         Runtime rt = Runtime.getRuntime();
         rt.gc();
         long before = rt.totalMemory() - rt.freeMemory();
 
-        // Створюємо дерева
-        forest.init();
-        List<TreeNaive> trees = forest.getAllNaive();
+        service.createTrees(count, type);
+        List<Tree> trees = service.getTrees();
 
-        // Вимірюємо пам'ять після
         rt.gc();
         long after = rt.totalMemory() - rt.freeMemory();
 
-        long usedBytes = after - before;
-        System.out.printf("MemoryTest -> Trees: %d, used = %,d bytes (≈ %.2f KB)%n",
-                trees.size(), usedBytes, usedBytes / 1024.0);
+        long used = after - before;
+        System.out.printf("MemoryTest -> Created %,d %s trees, used = %,d bytes (≈ %.2f KB)%n",
+                count, type, used, used/1024.0
+        );
     }
 }
