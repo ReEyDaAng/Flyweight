@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/forest")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = { "http://localhost:3000", "http://localhost:5173" })
 public class ForestController {
     private final ForestService service;
 
@@ -52,8 +52,7 @@ public class ForestController {
         MemoryUsage usage = memBean.getHeapMemoryUsage();
         long totalBytes = usage.getUsed();
         return Map.of(
-            "trees", trees,
-            "totalBytes", totalBytes
-        );
+                "trees", trees,
+                "totalBytes", totalBytes);
     }
 }
