@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Tree } from "@/components/Tree";
 import { MemoryChart } from "@/components/MemoryChart";
 import { TreeCounter } from "@/components/TreeCounter";
-import { TreePine, Palmtree, TreeDeciduous } from "lucide-react";
+import { TreePine, Palmtree, TreeDeciduous, TrashIcon } from "lucide-react";
 import { TreeType } from "./lib/types";
 import { Input } from "./components/ui/input";
 import { Label } from "./components/ui/label";
@@ -21,8 +21,8 @@ export interface TreeData {
 export default function App() {
   const [rightTrees, setRightTrees] = useState<TreeData[]>([]);
 
-  const [leftCountToCreate, setLeftCountToCreate] = useState(1);
-  const [rightCountToCreate, setRightCountToCreate] = useState(1);
+  const [leftCountToMutate, setLeftCountToMutate] = useState(1);
+  const [rightCountToMutate, setRightCountToMutate] = useState(1);
 
   const { data: leftTrees, error } = useForestQuery();
   const { createMutation: createLeft, removeMutation: removeLeft } =
@@ -63,15 +63,15 @@ export default function App() {
                 id="left-count"
                 type="number"
                 min={1}
-                value={leftCountToCreate}
-                onChange={(e) => setLeftCountToCreate(Number(e.target.value))}
+                value={leftCountToMutate}
+                onChange={(e) => setLeftCountToMutate(Number(e.target.value))}
                 className="border rounded px-2 py-1 w-20"
               />
             </div>
             <div className="flex gap-2">
               <Button
                 onClick={() =>
-                  plantTree("left", leftCountToCreate, TreeType.PINE)
+                  plantTree("left", leftCountToMutate, TreeType.PINE)
                 }
                 size="sm"
                 className="flex items-center gap-1"
@@ -81,7 +81,7 @@ export default function App() {
               </Button>
               <Button
                 onClick={() =>
-                  plantTree("left", leftCountToCreate, TreeType.PALM)
+                  plantTree("left", leftCountToMutate, TreeType.PALM)
                 }
                 size="sm"
                 className="flex items-center gap-1"
@@ -91,13 +91,22 @@ export default function App() {
               </Button>
               <Button
                 onClick={() =>
-                  plantTree("left", leftCountToCreate, TreeType.OAK)
+                  plantTree("left", leftCountToMutate, TreeType.OAK)
                 }
                 size="sm"
                 className="flex items-center gap-1"
               >
                 <TreeDeciduous className="h-4 w-4" />
                 <span>Дуб</span>
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => removeLeft.mutate(leftCountToMutate)}
+                size="sm"
+                className="flex items-center gap-1"
+              >
+                <TrashIcon />
+                Видалити
               </Button>
             </div>
           </div>
@@ -124,15 +133,15 @@ export default function App() {
                 id="right-count"
                 type="number"
                 min={1}
-                value={rightCountToCreate}
-                onChange={(e) => setRightCountToCreate(Number(e.target.value))}
+                value={rightCountToMutate}
+                onChange={(e) => setRightCountToMutate(Number(e.target.value))}
                 className="border rounded px-2 py-1 w-20"
               />
             </div>
             <div className="flex gap-2">
               <Button
                 onClick={() =>
-                  plantTree("right", rightCountToCreate, TreeType.PINE)
+                  plantTree("right", rightCountToMutate, TreeType.PINE)
                 }
                 size="sm"
                 className="flex items-center gap-1"
@@ -142,7 +151,7 @@ export default function App() {
               </Button>
               <Button
                 onClick={() =>
-                  plantTree("right", rightCountToCreate, TreeType.PALM)
+                  plantTree("right", rightCountToMutate, TreeType.PALM)
                 }
                 size="sm"
                 className="flex items-center gap-1"
@@ -152,13 +161,22 @@ export default function App() {
               </Button>
               <Button
                 onClick={() =>
-                  plantTree("right", rightCountToCreate, TreeType.OAK)
+                  plantTree("right", rightCountToMutate, TreeType.OAK)
                 }
                 size="sm"
                 className="flex items-center gap-1"
               >
                 <TreeDeciduous className="h-4 w-4" />
                 <span>Дуб</span>
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => console.log(123)}
+                size="sm"
+                className="flex items-center gap-1"
+              >
+                <TrashIcon />
+                Видалити
               </Button>
             </div>
           </div>
