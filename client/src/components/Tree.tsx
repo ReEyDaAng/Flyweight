@@ -1,26 +1,16 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { TreePine, Palmtree, TreeDeciduous } from "lucide-react";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@/components/ui/ContextMenu";
-
-export type TreeType = "pine" | "palm" | "oak";
+import { TreeType } from "@/lib/types";
 
 interface TreeProps {
-  id: string;
   x: number;
   y: number;
   type: TreeType;
-  onDelete: () => void;
 }
 
-export function Tree({ id, x, y, type, onDelete }: TreeProps) {
+export function Tree({ x, y, type }: TreeProps) {
   const [size, setSize] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
   const maxSize = useRef(Math.random() * 20 + 30); // Random size between 30-50
 
   useEffect(() => {
@@ -38,22 +28,9 @@ export function Tree({ id, x, y, type, onDelete }: TreeProps) {
     return () => clearInterval(growInterval);
   }, []);
 
-  const handleDelete = () => {
-    // Shrink animation before removal
-    setSize(0);
-
-    // Remove from DOM after animation completes
-    setTimeout(() => {
-      setIsVisible(false);
-      onDelete();
-    }, 500);
-  };
-
-  if (!isVisible) return null;
-
   const TreeComponent = () => {
     switch (type) {
-      case "pine":
+      case TreeType.PINE:
         return (
           <TreePine
             className="text-green-700"
@@ -61,7 +38,7 @@ export function Tree({ id, x, y, type, onDelete }: TreeProps) {
             strokeWidth={1.5}
           />
         );
-      case "palm":
+      case TreeType.PALM:
         return (
           <Palmtree
             className="text-green-500"
@@ -69,7 +46,7 @@ export function Tree({ id, x, y, type, onDelete }: TreeProps) {
             strokeWidth={1.5}
           />
         );
-      case "oak":
+      case TreeType.OAK:
         return (
           <TreeDeciduous
             className="text-green-600"
@@ -78,23 +55,17 @@ export function Tree({ id, x, y, type, onDelete }: TreeProps) {
           />
         );
       default:
-        return (
-          <TreePine
-            className="text-green-700"
-            size={maxSize.current}
-            strokeWidth={1.5}
-          />
-        );
+        return null;
     }
   };
 
   const getTrunkColor = () => {
     switch (type) {
-      case "pine":
+      case TreeType.PINE:
         return "#5D4037";
-      case "palm":
+      case TreeType.PALM:
         return "#8D6E63";
-      case "oak":
+      case TreeType.OAK:
         return "#795548";
       default:
         return "#8B4513";
@@ -102,36 +73,27 @@ export function Tree({ id, x, y, type, onDelete }: TreeProps) {
   };
 
   return (
-    <ContextMenu>
-      <ContextMenuTrigger>
-        <motion.div
-          className="absolute cursor-pointer"
-          style={{
-            left: `${x}%`,
-            top: `${y}%`,
-          }}
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: size / maxSize.current, opacity: 1 }}
-          exit={{ scale: 0, opacity: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <TreeComponent />
-          <motion.div
-            className="rounded-sm absolute left-1/2 bottom-0 -translate-x-1/2"
-            style={{
-              backgroundColor: getTrunkColor(),
-              height: maxSize.current * 0.3,
-              width: maxSize.current * 0.15,
-              bottom: -maxSize.current * 0.2,
-            }}
-          />
-        </motion.div>
-      </ContextMenuTrigger>
-      <ContextMenuContent>
-        <ContextMenuItem onClick={handleDelete} className="text-red-500">
-          Видалити дерево
-        </ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
+    <motion.div
+      initial={{ scale: 0 }}
+      animate={{ scale: size / maxSize.current }}
+      style={{
+        position: "absolute",
+        left: `${x}%`,
+        top: `${y}%`,
+        zIndex: 1,
+        cursor: "pointer",
+      }}
+    >
+      <svg width={maxSize.current} height={maxSize.current}>
+        <rect
+          x={maxSize.current / 2 - 3}
+          y={maxSize.current - 15}
+          width={6}
+          height={15}
+          fill={getTrunkColor()}
+        />
+      </svg>
+      <TreeComponent />
+    </motion.div>
   );
 }
