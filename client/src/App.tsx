@@ -10,6 +10,7 @@ import { TreeType } from "./lib/types";
 import { Input } from "./components/ui/input";
 import { Label } from "./components/ui/label";
 import { useForestQuery } from "./lib/useForestQuery";
+import { useForestMutation } from "./lib/useForestMutation";
 
 export interface TreeData {
   x: number;
@@ -19,15 +20,19 @@ export interface TreeData {
 
 export default function App() {
   const [rightTrees, setRightTrees] = useState<TreeData[]>([]);
-  const [leftCount, setLeftCount] = useState(1);
-  const [rightCount, setRightCount] = useState(1);
+
+  const [leftCountToCreate, setLeftCountToCreate] = useState(1);
+  const [rightCountToCreate, setRightCountToCreate] = useState(1);
 
   const { data: leftTrees, error } = useForestQuery();
+  const { createMutation: createLeft, removeMutation: removeLeft } =
+    useForestMutation();
 
   const getTreeCounts = (trees: TreeData[]) => {
     const pine = trees.filter((tree) => tree.type === TreeType.PINE).length;
     const palm = trees.filter((tree) => tree.type === TreeType.PALM).length;
     const oak = trees.filter((tree) => tree.type === TreeType.OAK).length;
+
     return { pine, palm, oak };
   };
 
@@ -35,16 +40,10 @@ export default function App() {
   const rightTreeCounts = getTreeCounts(rightTrees);
 
   const plantTree = (side: "left" | "right", count: number, type: TreeType) => {
-    const newTree = {
-      x: Math.floor(Math.random() * 400),
-      y: Math.floor(Math.random() * 400),
-      type,
-    };
-
     if (side === "left") {
-      console.log(1232);
+      createLeft.mutate({ count, type });
     } else {
-      setRightTrees([...rightTrees, ...Array(count).fill(newTree)]);
+      setRightTrees([...rightTrees, ...Array(count).fill({ type })]);
     }
   };
 
@@ -64,14 +63,16 @@ export default function App() {
                 id="left-count"
                 type="number"
                 min={1}
-                value={leftCount}
-                onChange={(e) => setLeftCount(Number(e.target.value))}
+                value={leftCountToCreate}
+                onChange={(e) => setLeftCountToCreate(Number(e.target.value))}
                 className="border rounded px-2 py-1 w-20"
               />
             </div>
             <div className="flex gap-2">
               <Button
-                onClick={() => plantTree("left", leftCount, TreeType.PINE)}
+                onClick={() =>
+                  plantTree("left", leftCountToCreate, TreeType.PINE)
+                }
                 size="sm"
                 className="flex items-center gap-1"
               >
@@ -79,7 +80,9 @@ export default function App() {
                 <span>Сосна</span>
               </Button>
               <Button
-                onClick={() => plantTree("left", leftCount, TreeType.PALM)}
+                onClick={() =>
+                  plantTree("left", leftCountToCreate, TreeType.PALM)
+                }
                 size="sm"
                 className="flex items-center gap-1"
               >
@@ -87,7 +90,9 @@ export default function App() {
                 <span>Пальма</span>
               </Button>
               <Button
-                onClick={() => plantTree("left", leftCount, TreeType.OAK)}
+                onClick={() =>
+                  plantTree("left", leftCountToCreate, TreeType.OAK)
+                }
                 size="sm"
                 className="flex items-center gap-1"
               >
@@ -119,14 +124,16 @@ export default function App() {
                 id="right-count"
                 type="number"
                 min={1}
-                value={rightCount}
-                onChange={(e) => setRightCount(Number(e.target.value))}
+                value={rightCountToCreate}
+                onChange={(e) => setRightCountToCreate(Number(e.target.value))}
                 className="border rounded px-2 py-1 w-20"
               />
             </div>
             <div className="flex gap-2">
               <Button
-                onClick={() => plantTree("right", rightCount, TreeType.PINE)}
+                onClick={() =>
+                  plantTree("right", rightCountToCreate, TreeType.PINE)
+                }
                 size="sm"
                 className="flex items-center gap-1"
               >
@@ -134,7 +141,9 @@ export default function App() {
                 <span>Сосна</span>
               </Button>
               <Button
-                onClick={() => plantTree("right", rightCount, TreeType.PALM)}
+                onClick={() =>
+                  plantTree("right", rightCountToCreate, TreeType.PALM)
+                }
                 size="sm"
                 className="flex items-center gap-1"
               >
@@ -142,7 +151,9 @@ export default function App() {
                 <span>Пальма</span>
               </Button>
               <Button
-                onClick={() => plantTree("right", rightCount, TreeType.OAK)}
+                onClick={() =>
+                  plantTree("right", rightCountToCreate, TreeType.OAK)
+                }
                 size="sm"
                 className="flex items-center gap-1"
               >
