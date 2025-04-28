@@ -15,9 +15,10 @@ public class ForestService {
      * Створює count дерев заданого типу.
      */
     public int createTrees(int count, Tree.TreeType type) {
-        int start = trees.size();
         for (int i = 0; i < count; i++) {
-            trees.add(new Tree(start + i, start + i, type));
+            int x = (int) (Math.random() * 101);
+            int y = (int) (Math.random() * 101);
+            trees.add(new Tree(x, y, type));
         }
         return count;
     }
