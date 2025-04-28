@@ -13,7 +13,7 @@ public class ForestNaiveApplication {
 		ConfigurableApplicationContext ctx = SpringApplication.run(ForestNaiveApplication.class, args);
 		ForestService service = ctx.getBean(ForestService.class);
 
-		int total = service.createTrees(500, Tree.TreeType.PINE);
+		int total = service.createTrees(10, Tree.TreeType.PINE);
 
 		Runtime rt = Runtime.getRuntime();
 		rt.gc();

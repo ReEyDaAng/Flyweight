@@ -24,40 +24,18 @@ public class ForestController {
     /**
      * POST /api/forest/createTrees
      * тіло: JSON-об'єкт з полями type (TreeType) і count (int)
-     * повертає:
-     *   totalAdded – кількість доданих
-     *   deltaBytes – скільки додалося пам’яті
-     *   totalBytes – скільки зараз займає весь heap
      */
     @PostMapping("/createTrees")
-    public ResponseEntity<Map<String, Object>> createTrees(@RequestBody Map<String, Object> request) {
-        MemoryMXBean memBean = ManagementFactory.getMemoryMXBean();
-        memBean.gc();
-        MemoryUsage beforeUsage = memBean.getHeapMemoryUsage();
-        long before = beforeUsage.getUsed();
-
-        // Parse and validate input
+    public ResponseEntity<Void> createTrees(@RequestBody Map<String, Object> request) {
         int count = ((Number) request.getOrDefault("count", 0)).intValue();
         Tree.TreeType type;
         try {
             type = Tree.TreeType.valueOf(request.get("type").toString());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Invalid tree type"));
+            return ResponseEntity.badRequest().build();
         }
-
-        int totalAdded = service.createTrees(count, type);
-
-        memBean.gc();
-        MemoryUsage afterUsage = memBean.getHeapMemoryUsage();
-        long after = afterUsage.getUsed();
-        long delta = after - before;
-        if (delta < 0) delta = 0;
-
-        return ResponseEntity.ok(Map.of(
-                "totalAdded", totalAdded,
-                "deltaBytes", delta,
-                "totalBytes", after
-        ));
+        service.createTrees(count, type);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/removeTrees")
@@ -67,7 +45,15 @@ public class ForestController {
     }
 
     @GetMapping("/getTrees")
-    public List<Tree> getTrees() {
-        return service.getTrees();
+    public Map<String, Object> getTrees() {
+        List<Tree> trees = service.getTrees();
+        MemoryMXBean memBean = ManagementFactory.getMemoryMXBean();
+        memBean.gc();
+        MemoryUsage usage = memBean.getHeapMemoryUsage();
+        long totalBytes = usage.getUsed();
+        return Map.of(
+            "trees", trees,
+            "totalBytes", totalBytes
+        );
     }
 }
