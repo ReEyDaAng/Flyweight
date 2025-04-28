@@ -10,26 +10,20 @@ import {
 } from "@/components/ui/Chart";
 
 interface MemoryChartProps {
-  treeCount: number;
+  bytes: number;
   forestName: string;
 }
 
-export function MemoryChart({ treeCount, forestName }: MemoryChartProps) {
-  // Generate mock memory data based on tree count
+export function MemoryChart({ bytes, forestName }: MemoryChartProps) {
+  const totalMemory = bytes / (1024 * 1024);
   const memoryData = useMemo(() => {
-    const baseMemory = 50; // Base memory in MB
-    const memoryPerTree = 2.5; // Memory per tree in MB
-    const totalMemory = baseMemory + treeCount * memoryPerTree;
-
-    // Generate data points for the last 10 minutes
+    const baseMemory = 50;
     return Array.from({ length: 10 }, (_, i) => {
       const minutesAgo = 9 - i;
-      const historicalTrees = Math.max(
-        0,
-        treeCount - Math.floor(Math.random() * 3 * minutesAgo)
+      const memory = Math.max(
+        baseMemory,
+        totalMemory - Math.random() * 5 * minutesAgo
       );
-      const memory = baseMemory + historicalTrees * memoryPerTree;
-
       return {
         time: `${minutesAgo} хв тому`,
         memory: memory.toFixed(1),
@@ -38,7 +32,7 @@ export function MemoryChart({ treeCount, forestName }: MemoryChartProps) {
       time: "зараз",
       memory: totalMemory.toFixed(1),
     });
-  }, [treeCount]);
+  }, [bytes, totalMemory]);
 
   return (
     <Card>
@@ -109,7 +103,7 @@ export function MemoryChart({ treeCount, forestName }: MemoryChartProps) {
               />
               <defs>
                 <linearGradient id="colorMemory" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.8} />
                   <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                 </linearGradient>
               </defs>
@@ -124,12 +118,12 @@ export function MemoryChart({ treeCount, forestName }: MemoryChartProps) {
             </p>
           </div>
           <div className="rounded-md bg-muted p-2">
-            <span className="text-muted-foreground">Дерева</span>
-            <p className="text-xs font-medium">{treeCount}</p>
+            <span className="text-muted-foreground">Всього</span>
+            <p className="text-xs font-medium">{bytes.toLocaleString()} Б</p>
           </div>
           <div className="rounded-md bg-muted p-2">
-            <span className="text-muted-foreground">На дерево</span>
-            <p className="text-xs font-medium">2.5 MB</p>
+            <span className="text-muted-foreground">Всього (МБ)</span>
+            <p className="text-xs font-medium">{totalMemory.toFixed(1)} МБ</p>
           </div>
         </div>
       </CardContent>

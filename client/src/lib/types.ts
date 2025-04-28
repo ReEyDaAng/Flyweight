@@ -1,5 +1,5 @@
 export enum TreeType {
-  PINE,
-  PALM,
-  OAK,
+  PINE = "PINE",
+  PALM = "PALM",
+  OAK = "OAK",
 }

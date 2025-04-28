@@ -81,7 +81,6 @@ export function Tree({ x, y, type }: TreeProps) {
         left: `${x}%`,
         top: `${y}%`,
         zIndex: 1,
-        cursor: "pointer",
       }}
     >
       <svg width={maxSize.current} height={maxSize.current}>
@@ -92,8 +91,10 @@ export function Tree({ x, y, type }: TreeProps) {
           height={15}
           fill={getTrunkColor()}
         />
+        <g>
+          <TreeComponent />
+        </g>
       </svg>
-      <TreeComponent />
     </motion.div>
   );
 }

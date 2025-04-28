@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/Button";
 import { Tree } from "@/components/Tree";
 import { MemoryChart } from "@/components/MemoryChart";
 import { TreeCounter } from "@/components/TreeCounter";
-import { v4 as uuidv4 } from "uuid";
 import { TreePine, Palmtree, TreeDeciduous } from "lucide-react";
 import { TreeType } from "./lib/types";
 import { Input } from "./components/ui/input";
@@ -19,12 +18,11 @@ export interface TreeData {
 }
 
 export default function App() {
-  const [leftTrees, setLeftTrees] = useState<TreeData[]>([]);
   const [rightTrees, setRightTrees] = useState<TreeData[]>([]);
   const [leftCount, setLeftCount] = useState(1);
   const [rightCount, setRightCount] = useState(1);
 
-  const { data } = useForestQuery();
+  const { data: leftTrees, error } = useForestQuery();
 
   const getTreeCounts = (trees: TreeData[]) => {
     const pine = trees.filter((tree) => tree.type === TreeType.PINE).length;
@@ -33,7 +31,7 @@ export default function App() {
     return { pine, palm, oak };
   };
 
-  const leftTreeCounts = getTreeCounts(data?.trees || []);
+  const leftTreeCounts = getTreeCounts(leftTrees?.trees || []);
   const rightTreeCounts = getTreeCounts(rightTrees);
 
   const plantTree = (side: "left" | "right", count: number, type: TreeType) => {
@@ -44,11 +42,13 @@ export default function App() {
     };
 
     if (side === "left") {
-      setLeftTrees([...leftTrees, ...Array(count).fill(newTree)]);
+      console.log(1232);
     } else {
       setRightTrees([...rightTrees, ...Array(count).fill(newTree)]);
     }
   };
+
+  if (error) return null;
 
   return (
     <main className="container mx-auto p-4 min-h-screen">
@@ -97,7 +97,7 @@ export default function App() {
             </div>
           </div>
           <div className="bg-green-50 rounded-md h-[400px] relative">
-            {leftTrees.map((tree) => (
+            {leftTrees?.trees.map((tree) => (
               <Tree
                 key={tree.x + tree.y + tree.type}
                 x={tree.x}
@@ -167,7 +167,7 @@ export default function App() {
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1 space-y-4">
           <MemoryChart
-            treeCount={leftTrees.length}
+            bytes={leftTrees?.totalBytes || 0}
             forestName="БЕЗ використання паттерна"
           />
           <TreeCounter
@@ -178,7 +178,7 @@ export default function App() {
 
         <div className="flex-1 space-y-4">
           <MemoryChart
-            treeCount={rightTrees.length}
+            bytes={rightTrees.length}
             forestName="З використанням паттерну"
           />
           <TreeCounter
