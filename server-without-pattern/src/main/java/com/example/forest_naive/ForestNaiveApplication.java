@@ -7,28 +7,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import java.util.Map;
-
-@SpringBootApplication(
-		exclude = DataSourceAutoConfiguration.class
-)
+@SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
 public class ForestNaiveApplication {
 	public static void main(String[] args) {
 		ConfigurableApplicationContext ctx = SpringApplication.run(ForestNaiveApplication.class, args);
 		ForestService service = ctx.getBean(ForestService.class);
 
-		// Демонстрація: створимо по 500 PINE та PALM і по 200 OAK
-		Map<Tree.TreeType, Integer> demo = Map.of(
-				Tree.TreeType.PINE, 500,
-				Tree.TreeType.PALM, 500,
-				Tree.TreeType.OAK, 200
-		);
+		int total = service.createTrees(500, Tree.TreeType.PINE);
 
 		Runtime rt = Runtime.getRuntime();
 		rt.gc();
 		long before = rt.totalMemory() - rt.freeMemory();
-
-		int total = service.createTreesBatch(demo);  // використовується метод batch
 
 		rt.gc();
 		long after = rt.totalMemory() - rt.freeMemory();
@@ -37,7 +26,6 @@ public class ForestNaiveApplication {
 				"Demo added %,d trees, memory used = %,d bytes (≈ %.2f KB)%n",
 				total,
 				(after - before),
-				(after - before) / 1024.0
-		);
+				(after - before) / 1024.0);
 	}
 }

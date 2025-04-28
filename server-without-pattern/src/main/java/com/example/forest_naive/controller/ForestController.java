@@ -22,43 +22,42 @@ public class ForestController {
     }
 
     /**
-     * POST /api/forest/createTreesBatch
-     * тіло: JSON-мапа тип→кількість
+     * POST /api/forest/createTrees
+     * тіло: JSON-об'єкт з полями type (TreeType) і count (int)
      * повертає:
      *   totalAdded – кількість доданих
      *   deltaBytes – скільки додалося пам’яті
      *   totalBytes – скільки зараз займає весь heap
      */
-    @PostMapping("/createTreesBatch")
-    public ResponseEntity<Map<String, Object>> createTreesBatch(
-            @RequestBody Map<Tree.TreeType, Integer> request
-    ) {
+    @PostMapping("/createTrees")
+    public ResponseEntity<Map<String, Object>> createTrees(@RequestBody Map<String, Object> request) {
         MemoryMXBean memBean = ManagementFactory.getMemoryMXBean();
-
-        // 1. замір до
         memBean.gc();
         MemoryUsage beforeUsage = memBean.getHeapMemoryUsage();
         long before = beforeUsage.getUsed();
 
-        // 2. batch-додавання (не очищає попередні)
-        int totalAdded = service.createTreesBatch(request);
+        // Parse and validate input
+        int count = ((Number) request.getOrDefault("count", 0)).intValue();
+        Tree.TreeType type;
+        try {
+            type = Tree.TreeType.valueOf(request.get("type").toString());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid tree type"));
+        }
 
-        // 3. замір після
+        int totalAdded = service.createTrees(count, type);
+
         memBean.gc();
         MemoryUsage afterUsage = memBean.getHeapMemoryUsage();
         long after = afterUsage.getUsed();
-
-        // 4. різниця (клап на нуль — не від’ємне)
         long delta = after - before;
         if (delta < 0) delta = 0;
 
-        Map<String, Object> resp = Map.of(
-                "totalAdded",  totalAdded,
-                "deltaBytes",  delta,
-                "totalBytes",  after,
-                "totalKB",     after / 1024.0
-        );
-        return ResponseEntity.ok(resp);
+        return ResponseEntity.ok(Map.of(
+                "totalAdded", totalAdded,
+                "deltaBytes", delta,
+                "totalBytes", after
+        ));
     }
 
     @DeleteMapping("/removeTrees")

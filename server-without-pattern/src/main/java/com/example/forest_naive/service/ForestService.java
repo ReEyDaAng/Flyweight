@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.ArrayList;
-import java.util.Map;
 
 @Service
 public class ForestService {
@@ -21,20 +20,6 @@ public class ForestService {
             trees.add(new Tree(start + i, start + i, type));
         }
         return count;
-    }
-
-    /**
-     * Створює різну кількість дерев для кожного типу.
-     * @param request мапа: тип дерева → кількість
-     * @return загальна кількість доданих дерев
-     */
-    public int createTreesBatch(Map<Tree.TreeType, Integer> request) {
-        int total = 0;
-        for (Map.Entry<Tree.TreeType, Integer> e : request.entrySet()) {
-            int added = createTrees(e.getValue(), e.getKey());
-            total += added;
-        }
-        return total;
     }
 
     /**
