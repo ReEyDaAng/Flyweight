@@ -58,7 +58,7 @@ export default function App() {
       <div className="flex flex-col md:flex-row gap-4 mb-8">
         <Card className="flex-1 p-4 min-h-[500px] relative overflow-hidden">
           <h2 className="text-xl font-semibold">БЕЗ використання паттерна</h2>
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-wrap gap-y-2 justify-between items-center mb-4">
             <div className="flex gap-2 items-center">
               <Label htmlFor="left-count" className="text-sm">
                 Кількість:
@@ -72,7 +72,7 @@ export default function App() {
                 className="border rounded px-2 py-1 w-20"
               />
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button
                 onClick={() =>
                   plantTree("left", leftCountToMutate, TreeType.PINE)
@@ -128,7 +128,7 @@ export default function App() {
 
         <Card className="flex-1 p-4 min-h-[500px] relative overflow-hidden">
           <h2 className="text-xl font-semibold">З використанням паттерну</h2>
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-wrap gap-y-2 justify-between items-center mb-4">
             <div className="flex gap-2 items-center">
               <Label htmlFor="right-count" className="text-sm">
                 Кількість:
@@ -142,7 +142,7 @@ export default function App() {
                 className="border rounded px-2 py-1 w-20"
               />
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button
                 onClick={() =>
                   plantTree("right", rightCountToMutate, TreeType.PINE)
