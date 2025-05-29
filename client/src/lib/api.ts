@@ -1,10 +1,17 @@
-import axios from 'axios';
+import axios from "axios";
 
-const api = axios.create({
-  baseURL: 'http://localhost:8081/api/forest',
+const apiLeft = axios.create({
+  baseURL: "http://localhost:8081/api/forest",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
-export default api;
+const apiRight = axios.create({
+  baseURL: "http://localhost:8082/api/forest",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+export { apiLeft, apiRight };

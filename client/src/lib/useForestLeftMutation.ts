@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "./api";
+import { apiLeft } from "./api";
 import { TreeType } from "./types";
 
-export function useForestMutation() {
+export function useForestLeftMutation() {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
     mutationFn: async (payload: { count: number; type: TreeType }) => {
-      await api.post("/createTrees", payload);
+      await apiLeft.post("/createTrees", payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["forest"] });
@@ -16,7 +16,7 @@ export function useForestMutation() {
 
   const removeMutation = useMutation({
     mutationFn: async (count: number) => {
-      await api.delete(`/removeTrees?count=${count}`);
+      await apiLeft.delete(`/removeTrees?count=${count}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["forest"] });

@@ -9,8 +9,10 @@ import { TreePine, Palmtree, TreeDeciduous, TrashIcon } from "lucide-react";
 import { TreeType } from "./lib/types";
 import { Input } from "./components/ui/Input";
 import { Label } from "./components/ui/Label";
-import { useForestQuery } from "./lib/useForestQuery";
-import { useForestMutation } from "./lib/useForestMutation";
+import { useForestLeftQuery } from "./lib/useForestLeftQuery";
+import { useForestLeftMutation } from "./lib/useForestLeftMutation";
+import { useForestRightQuery } from "./lib/useForestRightQuery";
+import { useForestRightMutation } from "./lib/useForestRightMutation";
 
 export interface TreeData {
   x: number;
@@ -19,14 +21,16 @@ export interface TreeData {
 }
 
 export default function App() {
-  const [rightTrees, setRightTrees] = useState<TreeData[]>([]);
-
   const [leftCountToMutate, setLeftCountToMutate] = useState(1);
   const [rightCountToMutate, setRightCountToMutate] = useState(1);
 
-  const { data: leftTrees, error } = useForestQuery();
+  const { data: leftTrees, error: leftError } = useForestLeftQuery();
+  const { data: rightTrees, error: rightError } = useForestRightQuery();
+
   const { createMutation: createLeft, removeMutation: removeLeft } =
-    useForestMutation();
+    useForestLeftMutation();
+  const { createMutation: createRight, removeMutation: removeRight } =
+    useForestRightMutation();
 
   const getTreeCounts = (trees: TreeData[]) => {
     const pine = trees.filter((tree) => tree.type === TreeType.PINE).length;
@@ -37,17 +41,17 @@ export default function App() {
   };
 
   const leftTreeCounts = getTreeCounts(leftTrees?.trees || []);
-  const rightTreeCounts = getTreeCounts(rightTrees);
+  const rightTreeCounts = getTreeCounts(rightTrees?.trees || []);
 
   const plantTree = (side: "left" | "right", count: number, type: TreeType) => {
     if (side === "left") {
       createLeft.mutate({ count, type });
     } else {
-      setRightTrees([...rightTrees, ...Array(count).fill({ type })]);
+      createRight.mutate({ count, type });
     }
   };
 
-  if (error) return null;
+  if (leftError || rightError) return null;
 
   return (
     <main className="container mx-auto p-4 min-h-screen">
@@ -171,7 +175,7 @@ export default function App() {
               </Button>
               <Button
                 variant="destructive"
-                onClick={() => console.log(123)}
+                onClick={() => removeRight.mutate(rightCountToMutate)}
                 size="sm"
                 className="flex items-center gap-1"
               >
@@ -181,7 +185,7 @@ export default function App() {
             </div>
           </div>
           <div className="bg-green-50 rounded-md h-[400px] relative">
-            {rightTrees.map((tree) => (
+            {rightTrees?.trees.map((tree) => (
               <Tree
                 key={tree.x + tree.y + tree.type}
                 x={tree.x}
@@ -195,7 +199,7 @@ export default function App() {
 
       <MemoryChart
         bytes1={leftTrees?.totalBytes || 0}
-        bytes2={rightTrees.length}
+        bytes2={rightTrees?.totalBytes || 0}
       />
 
       <div className="mt-8 flex flex-col md:flex-row gap-4">
