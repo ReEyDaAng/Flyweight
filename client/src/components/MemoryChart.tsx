@@ -1,51 +1,43 @@
-import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import {
-  Area,
-  AreaChart,
+  BarChart,
+  Bar,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
-} from "@/components/ui/Chart";
+} from "recharts";
 
 interface MemoryChartProps {
-  bytes: number;
-  forestName: string;
+  bytes1: number;
+  bytes2: number;
 }
 
-export function MemoryChart({ bytes, forestName }: MemoryChartProps) {
-  const totalMemory = bytes / (1024 * 1024);
-  const memoryData = useMemo(() => {
-    const baseMemory = 50;
-    return Array.from({ length: 10 }, (_, i) => {
-      const minutesAgo = 9 - i;
-      const memory = Math.max(
-        baseMemory,
-        totalMemory - Math.random() * 5 * minutesAgo
-      );
-      return {
-        time: `${minutesAgo} хв тому`,
-        memory: memory.toFixed(1),
-      };
-    }).concat({
-      time: "зараз",
-      memory: totalMemory.toFixed(1),
-    });
-  }, [bytes, totalMemory]);
+export function MemoryChart({ bytes1, bytes2 }: MemoryChartProps) {
+  const mb1 = bytes1 / (1024 * 1024);
+  const mb2 = bytes2 / (1024 * 1024);
+
+  const data = [
+    {
+      name: "Пам'ять БЕЗ паттерна",
+      value: Number(mb1.toFixed(1)),
+    },
+    {
+      name: "Пам'ять З паттерном",
+      value: Number(mb2.toFixed(1)),
+    },
+  ];
 
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-md font-medium">
-          Розподіл пам'яті - {forestName}
-        </CardTitle>
+        <CardTitle className="text-md font-medium">Розподіл пам'яті</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[150px]">
+        <div className="h-[200px]">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
-              data={memoryData}
+            <BarChart
+              data={data}
               margin={{
                 top: 5,
                 right: 10,
@@ -54,7 +46,7 @@ export function MemoryChart({ bytes, forestName }: MemoryChartProps) {
               }}
             >
               <XAxis
-                dataKey="time"
+                dataKey="name"
                 tickLine={false}
                 axisLine={false}
                 tick={{ fontSize: 12 }}
@@ -70,23 +62,13 @@ export function MemoryChart({ bytes, forestName }: MemoryChartProps) {
                   if (active && payload && payload.length) {
                     return (
                       <div className="rounded-lg border bg-background p-2 shadow-sm">
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="flex flex-col">
-                            <span className="text-[0.70rem] uppercase text-muted-foreground">
-                              Час
-                            </span>
-                            <span className="font-bold text-xs">
-                              {payload[0].payload.time}
-                            </span>
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="text-[0.70rem] uppercase text-muted-foreground">
-                              Пам'ять
-                            </span>
-                            <span className="font-bold text-xs">
-                              {payload[0].value} MB
-                            </span>
-                          </div>
+                        <div className="flex flex-col">
+                          <span className="text-[0.70rem] uppercase text-muted-foreground">
+                            Memory
+                          </span>
+                          <span className="font-bold text-xs">
+                            {payload[0].value} MB
+                          </span>
                         </div>
                       </div>
                     );
@@ -94,36 +76,22 @@ export function MemoryChart({ bytes, forestName }: MemoryChartProps) {
                   return null;
                 }}
               />
-              <Area
-                type="monotone"
-                dataKey="memory"
-                stroke="#6366f1"
-                fill="url(#colorMemory)"
-                strokeWidth={2}
-              />
-              <defs>
-                <linearGradient id="colorMemory" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-            </AreaChart>
+              <Bar dataKey="value" fill="#4ade80" />
+            </BarChart>
           </ResponsiveContainer>
         </div>
-        <div className="mt-2 grid grid-cols-3 gap-2 text-center text-sm">
+        <div className="mt-2 grid grid-cols-2 gap-2 text-center text-sm">
           <div className="rounded-md bg-muted p-2">
-            <span className="text-muted-foreground">Поточна</span>
-            <p className="text-xs font-medium">
-              {memoryData[memoryData.length - 1].memory} MB
-            </p>
+            <span className="text-muted-foreground">Пам'ять БЕЗ паттерна</span>
+            <p className="text-xs font-medium">{mb1.toFixed(1)} MB</p>
           </div>
           <div className="rounded-md bg-muted p-2">
-            <span className="text-muted-foreground">Всього</span>
-            <p className="text-xs font-medium">{bytes.toLocaleString()} Б</p>
+            <span className="text-muted-foreground">Пам'ять З паттерном</span>
+            <p className="text-xs font-medium">{mb2.toFixed(1)} MB</p>
           </div>
-          <div className="rounded-md bg-muted p-2">
-            <span className="text-muted-foreground">Всього (МБ)</span>
-            <p className="text-xs font-medium">{totalMemory.toFixed(1)} МБ</p>
+          <div className="col-span-2 rounded-md bg-muted p-2">
+            <span className="text-muted-foreground">Різниця в пам'яті</span>
+            <p className="text-xs font-medium">{(mb1 - mb2).toFixed(1)} MB</p>
           </div>
         </div>
       </CardContent>

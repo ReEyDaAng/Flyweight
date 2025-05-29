@@ -7,8 +7,8 @@ import { MemoryChart } from "@/components/MemoryChart";
 import { TreeCounter } from "@/components/TreeCounter";
 import { TreePine, Palmtree, TreeDeciduous, TrashIcon } from "lucide-react";
 import { TreeType } from "./lib/types";
-import { Input } from "./components/ui/input";
-import { Label } from "./components/ui/label";
+import { Input } from "./components/ui/Input";
+import { Label } from "./components/ui/Label";
 import { useForestQuery } from "./lib/useForestQuery";
 import { useForestMutation } from "./lib/useForestMutation";
 
@@ -193,28 +193,21 @@ export default function App() {
         </Card>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-1 space-y-4">
-          <MemoryChart
-            bytes={leftTrees?.totalBytes || 0}
-            forestName="БЕЗ використання паттерна"
-          />
-          <TreeCounter
-            counts={leftTreeCounts}
-            forestName="БЕЗ використання паттерна"
-          />
-        </div>
+      <MemoryChart
+        bytes1={leftTrees?.totalBytes || 0}
+        bytes2={rightTrees.length}
+      />
 
-        <div className="flex-1 space-y-4">
-          <MemoryChart
-            bytes={rightTrees.length}
-            forestName="З використанням паттерну"
-          />
-          <TreeCounter
-            counts={rightTreeCounts}
-            forestName="З використанням паттерну"
-          />
-        </div>
+      <div className="mt-8 flex flex-col md:flex-row gap-4">
+        <TreeCounter
+          counts={leftTreeCounts}
+          forestName="БЕЗ використання паттерна"
+        />
+
+        <TreeCounter
+          counts={rightTreeCounts}
+          forestName="З використанням паттерну"
+        />
       </div>
     </main>
   );

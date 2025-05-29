@@ -14,7 +14,7 @@ export function TreeCounter({ counts, forestName }: TreeCounterProps) {
   const totalTrees = counts.pine + counts.palm + counts.oak;
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader className="pb-2">
         <CardTitle className="text-md font-medium">
           Кількість дерев - {forestName}
