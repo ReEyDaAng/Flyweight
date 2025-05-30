@@ -1,6 +1,6 @@
 package com.example.forest_naive.controller;
 
-import com.example.forest_naive.model.Tree;
+import com.example.forest_naive.entity.Tree;
 import com.example.forest_naive.service.ForestService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
