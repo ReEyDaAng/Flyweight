@@ -1,6 +1,6 @@
 package com.example.forest_naive.controller;
 
-import com.example.forest_naive.model.Tree;
+import com.example.forest_naive.entity.Tree;
 import com.example.forest_naive.service.ForestService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,12 +28,7 @@ public class ForestController {
     @PostMapping("/createTrees")
     public ResponseEntity<Void> createTrees(@RequestBody Map<String, Object> request) {
         int count = ((Number) request.getOrDefault("count", 0)).intValue();
-        Tree.TreeType type;
-        try {
-            type = Tree.TreeType.valueOf(request.get("type").toString());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+        String type = request.get("type").toString();
         service.createTrees(count, type);
         return ResponseEntity.ok().build();
     }
